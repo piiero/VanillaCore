@@ -1,0 +1,16 @@
+main: be.nickoos.vmcore.Main
+name: VanillaMinecraftCore
+version: 0.1
+author: Nickoos
+description: Plugin pour Vanilla-Minecraft
+
+commands:
+  reboot:
+    usage: /reboot
+    description: Redemarrage du serveur apres 60 secondes
+  spawn:
+    usage: /spawn
+    description: spawn
+  setspawn:
+    usage: /setspawn
+    description: set spawn
