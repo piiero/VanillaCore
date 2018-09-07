@@ -1,0 +1,17 @@
+﻿# Annnonce 
+# -----------------
+
+# Envoyer un message aléaoire ? (true ou false)
+random-order: false
+
+# Temps entre chaques messages (en minutes) ?
+message-delay: 15
+
+# Prefix dans chaque message ?
+message-prefix: '&c[Annonce] '
+
+# Liste des messages
+
+messages:
+  - "Ceci est un message de base"
+  - "Si tu lis ceci, c'est que Nikkouette a bien installé plugin !"

@@ -1,6 +1,7 @@
 package be.nickoos.vmcore;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -25,11 +26,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.FileConfiguration;
+import be.nickoos.vmcore.AnnounceTask;
+
 
 @SuppressWarnings("unused")
+
 public class Main extends JavaPlugin implements Listener {
 	static Main plugin;
 	static ConfigManager cm;
@@ -38,6 +42,18 @@ public class Main extends JavaPlugin implements Listener {
 	PluginManager pm;
 	static int res;
 	
+	private static final int TICKS_PER_SEC = 20;
+	private static final int SECS_PER_MIN = 60;
+
+	public BukkitTask task = null;
+
+	public List<String> messages = null;
+
+	public boolean random = false;
+	public int delay = 0;
+	public String prefix = null;
+	
+	@Override
 	public void onEnable(){
 		plugin = this;
 		this.pm = Bukkit.getPluginManager();
@@ -57,12 +73,36 @@ public class Main extends JavaPlugin implements Listener {
 	    Spawn.loadConfig();
 	    HomeBed.load();
 	    
-		getServer().getConsoleSender().sendMessage("§a[§bVanillaCore§a] §eChargé !");
+	    saveDefaultConfig();
+	    
+		random = getConfig().getBoolean("random-order");
+		delay = getConfig().getInt("message-delay");
+		prefix = ChatColor.translateAlternateColorCodes('&', getConfig().getString("message-prefix"));
+		messages = getConfig().getStringList("messages");
+		
+		if (messages.isEmpty()) {
+			getLogger().info("There are no valid messages defined in config.yml! Disabling...");
+			getServer().getPluginManager().disablePlugin(this);
+			return;
+		} else {
+
+			for (int i = 0; i < messages.size(); i++) {
+				messages.set(i, ChatColor.translateAlternateColorCodes('&', messages.get(i)));
+			}
+		}
+
+		task = new AnnounceTask(this).runTaskTimer(this, 0, delay * TICKS_PER_SEC * SECS_PER_MIN);
+
+			    
+	    getServer().getConsoleSender().sendMessage("§a[§bVanillaCore§a] §eChargé !");
 	}
 	public static Main getPlugin() {
 	    return plugin;
 	}
 	public void onDisable(){
+		if (task != null) {
+			task.cancel();
+		}
 		getServer().getConsoleSender().sendMessage("§a[§bVanillaCore§a] §eDéchargé !");
 	}
 	public boolean onCommand(CommandSender sender, Command cmd, String msg, String[] arg) {
